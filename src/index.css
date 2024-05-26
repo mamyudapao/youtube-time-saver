@@ -1,0 +1,15 @@
+body {
+  width: 400px;  /* 指定したい幅 */
+  height: 300px; /* 指定したい高さ */
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* 必要に応じて設定 */
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}

@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Youtube Time Saver",
+  "version": "1.0",
+  "description": "This is my first React Chrome extension!",
+  "permissions": ["activeTab", "scripting", "storage", "www.youtube.com/*"],
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["src/content.tsx"]
+    }
+  ]
+}
