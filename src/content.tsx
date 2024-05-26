@@ -1,7 +1,19 @@
-// コンソールにメッセージを表示
-console.log("Content script loaded");
+import { PlayMode } from "./types";
 
-// ページのビデオ要素を非表示にする
-document.querySelectorAll("video").forEach((video) => {
-  video.style.display = "none";
-});
+const getCurrentModeFromLocalStorage = async () => {
+  const currentMode = (await chrome.storage.local.get("mode")) as {
+    mode: PlayMode;
+  };
+  return currentMode.mode;
+};
+
+const main = async () => {
+  const currentMode = await getCurrentModeFromLocalStorage();
+  if (currentMode === "radio") {
+    document.querySelectorAll("video").forEach((video) => {
+      video.style.display = "none";
+    });
+  }
+};
+
+main();

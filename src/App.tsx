@@ -7,7 +7,7 @@ type PlayMode = "radio" | "video";
 const App: React.FC = () => {
   const [mode, setMode] = useState<PlayMode>("radio");
   const handleClickRadioMode = () => {
-    localStorage.setItem("mode", "radio");
+    chrome.storage.local.set({ mode: "radio" });
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tabId = tabs[0].id ?? 0;
       chrome.scripting.executeScript({
@@ -24,7 +24,7 @@ const App: React.FC = () => {
   };
 
   const handleClickVideoMode = () => {
-    localStorage.setItem("mode", "video");
+    chrome.storage.local.set({ mode: "video" });
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tabId = tabs[0].id ?? 0;
       chrome.scripting.executeScript({
@@ -40,12 +40,15 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    if (localStorage.getItem("mode") === "radio") {
-      handleClickRadioMode();
-    } else {
-      handleClickVideoMode();
-    }
-  });
+    chrome.storage.local.get("mode").then((items) => {
+      setMode(items.mode);
+      if (items.mode === "radio") {
+        handleClickRadioMode;
+      } else if (items.mode === "video") {
+        handleClickVideoMode;
+      }
+    });
+  }, [mode]);
 
   return (
     <div className="App">
