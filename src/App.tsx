@@ -1,4 +1,4 @@
-import { Button, Flex } from "@mantine/core";
+import { Button, Flex, Text } from "@mantine/core";
 import "./App.css";
 import { useEffect, useState } from "react";
 
@@ -6,6 +6,7 @@ type PlayMode = "radio" | "video";
 
 const App: React.FC = () => {
   const [mode, setMode] = useState<PlayMode>("radio");
+  const [watchTime, setWatchTime] = useState<number>(0);
   const handleClickRadioMode = () => {
     chrome.storage.local.set({ mode: "radio" });
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -39,6 +40,20 @@ const App: React.FC = () => {
     });
   };
 
+  const getCurrentWatchTime = async () => {
+    const watchTime = (await chrome.storage.local.get("watchTime")) as {
+      watchTime: number;
+    };
+    return watchTime.watchTime;
+  };
+
+  const formatWatchTime = (watchTime: number) => {
+    const hours = Math.floor(watchTime / 3600);
+    const minutes = Math.floor((watchTime % 3600) / 60);
+    const seconds = watchTime % 60;
+    return `${hours}h:${minutes}m:${seconds}s`;
+  };
+
   useEffect(() => {
     chrome.storage.local.get("mode").then((items) => {
       setMode(items.mode);
@@ -48,6 +63,11 @@ const App: React.FC = () => {
         handleClickVideoMode;
       }
     });
+    setInterval(() => {
+      getCurrentWatchTime().then((watchTime) => {
+        setWatchTime(watchTime);
+      });
+    }, 1000);
   }, [mode]);
 
   return (
@@ -59,6 +79,7 @@ const App: React.FC = () => {
           align="center"
           style={{ height: "100vh" }}
         >
+          <Text>{"Viewing time is " + formatWatchTime(watchTime)}</Text>
           <Flex direction="row" justify="center" align="center" gap="md">
             <Button
               color={mode === "radio" ? "blue" : "gray"}
