@@ -18,6 +18,31 @@ const incrementWatchTime = async () => {
   chrome.storage.local.set({ watchTime: watchTime.watchTime });
 };
 
+const manageWatchTimeState = async () => {
+  const currentMode = await getCurrentModeFromLocalStorage();
+  if (currentMode === "video") {
+    incrementWatchTime();
+  }
+};
+
+const forceChangeModeToRadioIfWatchTimeLimitExceeded = async () => {
+  const watchTimeLimit = (await chrome.storage.local.get("watchTimeLimit")) as {
+    watchTimeLimit: number;
+  };
+  const watchTime = (await chrome.storage.local.get("watchTime")) as {
+    watchTime: number;
+  };
+  if (
+    watchTimeLimit.watchTimeLimit &&
+    watchTime.watchTime >= watchTimeLimit.watchTimeLimit * 60
+  ) {
+    chrome.storage.local.set({ mode: "radio" });
+    document.querySelectorAll("video").forEach((video) => {
+      video.style.display = "none";
+    });
+  }
+};
+
 const main = async () => {
   const currentMode = await getCurrentModeFromLocalStorage();
   console.log("Hello", currentMode);
@@ -26,7 +51,8 @@ const main = async () => {
       video.style.display = "none";
     });
   }
-  setInterval(incrementWatchTime, 1000);
+  setInterval(manageWatchTimeState, 1000);
+  setInterval(forceChangeModeToRadioIfWatchTimeLimitExceeded, 1500);
 };
 
 main();
